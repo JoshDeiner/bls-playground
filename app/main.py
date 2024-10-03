@@ -20,7 +20,9 @@ from redis.asyncio.connection import ConnectionPool
 from starlette.requests import Request
 from starlette.responses import Response
 
+# local imports
 from app.routers.series_router import router as series_router
+from app.database import init_db
 
 load_dotenv()
 
@@ -74,10 +76,14 @@ app.include_router(series_router)
 
 KEY = os.getenv("REG_KEY")
 
+@app.on_event("startup")
+def startup_event():
+    init_db()  # Create the tables if they don't exist
+
 
 @app.get("/")
 def home():
-    return {"message": "Hello World"}
+    return {"message": "Welcome to API entrypoint"}
 
 
 @app.post("/inflation_all/")

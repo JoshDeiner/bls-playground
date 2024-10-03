@@ -1,10 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.schemas.series import SeriesRequest
+from app.models.schemas import SeriesRequest
 from app.services.bls_service import fetch_bls_series_data
 from app.services.series_service import upsert_series
+from app.services.processing import map_bls_data_with_ids
+
 
 router = APIRouter()
 
@@ -14,9 +18,19 @@ router = APIRouter()
 # this is probably not right. on the post we hit the 3rd party
 # probably at least need to pass in an ID
 @router.post("/series")
-def update_series(series_request: SeriesRequest, db: Session = Depends(get_db)):
+def update_series(db: Session = Depends(get_db)):
+
     try:
-        upsert_series(db, series_request)
+        # ideal dode
+        # bls_data = await fetch_bls_series_data("SUUR0000SA0")
+        # You'd map the BLS data to your SeriesRequest Pydantic model here
+        # srequest = map_bls_data_with_ids(bls_data)
+        # print("series_request", srequest)
+
+        # mock object
+        request = map_bls_data_with_ids()
+        series = request.get("series", 1)
+        upsert_series(series, db)
         return {"status": "success", "message": "Series data updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

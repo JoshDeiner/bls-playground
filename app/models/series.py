@@ -20,6 +20,10 @@ class Series(Base):
     # Relationship to SeriesData
     series_data = relationship("SeriesData", back_populates="series")
 
+    # Add the __repr__ method
+    def __repr__(self):
+        return f"<Series(id={self.id}, catalog_id={self.catalog_id}, catalog_title={self.catalog_title})>"
+
 
 # SeriesData table definition
 class SeriesData(Base):

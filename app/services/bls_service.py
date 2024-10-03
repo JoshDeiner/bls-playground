@@ -3,13 +3,16 @@ import os
 import httpx
 from fastapi import HTTPException
 
+from fastapi import APIRouter
+
+
 KEY = os.getenv("REG_KEY")
 
 router = APIRouter()
 
 
 # Function to call the BLS API
-def fetch_bls_series_data(series_id: str = "SUUR0000SA0"):
+async def fetch_bls_series_data(series_id: str = "SUUR0000SA0"):
     url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
     params = {
         "seriesid": [series_id],
@@ -31,3 +34,6 @@ def fetch_bls_series_data(series_id: str = "SUUR0000SA0"):
                 status_code=response.status_code,
                 detail="Error fetching data from BLS API",
             )
+
+
+            

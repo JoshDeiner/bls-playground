@@ -6,7 +6,7 @@ from pydantic import BaseModel
 # Model for catalog details
 class Series(BaseModel):
     series_title: str
-    series_id: str
+    catalog_id: str
     seasonality: str
     survey_name: str
     measure_data_type: str
@@ -31,8 +31,13 @@ class SeriesData(BaseModel):
     calculations: Optional[Calculations]
 
 
+# change the mapping so that catalog doesnt exist
+# essentially we just have a series object that access directly
+# how will this work with SeriesRequest. do you access SeriesRequest?
+
 # Main series request model, includes catalog and data
 class SeriesRequest(BaseModel):
-    seriesID: str
-    catalog: Series
-    data: List[SeriesData]
+    # catalog_id: int
+    series: Series
+    series_data: List[SeriesData]
+    calculations: Calculations
