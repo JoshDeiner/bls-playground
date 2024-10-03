@@ -1,5 +1,6 @@
+from typing import Dict, List, Optional
+
 from pydantic import BaseModel
-from typing import List, Dict, Optional
 
 
 # Model for catalog details
@@ -15,7 +16,8 @@ class Series(BaseModel):
 
 # Model for calculations
 class Calculations(BaseModel):
-    pct_changes: Optional[Dict[str, str]]  # A dictionary for percentage changes
+    # A dictionary for percentage changes
+    pct_changes: Optional[Dict[str, str]]
     net_changes: Optional[Dict[str, str]]  # A dictionary for net changes
 
 

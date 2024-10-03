@@ -1,28 +1,24 @@
-from fastapi import FastAPI, HTTPException
-from dotenv import load_dotenv
-import httpx
-import os
-import aioredis
-
-from contextlib import asynccontextmanager
-from typing import AsyncIterator, Any
-import orjson
-
 import logging
-from starlette.requests import Request
-from starlette.responses import Response
+import os
 import time
+from contextlib import asynccontextmanager
+from typing import Any, AsyncIterator
 
+import aioredis
+import httpx
+import orjson
+import redis.asyncio as redis
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse
-from fastapi_cache import FastAPICache
+from fastapi_cache import Coder, FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.coder import PickleCoder
 from fastapi_cache.decorator import cache
-from fastapi.encoders import jsonable_encoder
-from fastapi_cache import Coder
-
-import redis.asyncio as redis
 from redis.asyncio.connection import ConnectionPool
+from starlette.requests import Request
+from starlette.responses import Response
 
 from app.routers.series_router import router as series_router
 
@@ -118,10 +114,11 @@ async def bls_response():
 #### then present the API to be consumed by a llm model ####
 
 
-#### TODO NEXT ADD logging. Why?
+# TODO NEXT ADD logging. Why?
 
-#### i want to see if you are actually caching or not
+# i want to see if you are actually caching or not
 
-#### i want to eventually test the APIs and add automation and stop gaps for when you come close to failing the limit
+# i want to eventually test the APIs and add automation and stop gaps for
+# when you come close to failing the limit
 
-#### what is a good philosophy for logging
+# what is a good philosophy for logging

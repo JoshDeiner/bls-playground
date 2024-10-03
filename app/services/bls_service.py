@@ -1,6 +1,6 @@
 import os
-import httpx
 
+import httpx
 from fastapi import HTTPException
 
 KEY = os.getenv("REG_KEY")
