@@ -14,12 +14,10 @@ router = APIRouter()
 # this is probably not right. on the post we hit the 3rd party
 # probably at least need to pass in an ID
 @router.post("/series")
-def update_series(series_request: SeriesRequest,
-                  db: Session = Depends(get_db)):
+def update_series(series_request: SeriesRequest, db: Session = Depends(get_db)):
     try:
         upsert_series(db, series_request)
-        return {"status": "success",
-                "message": "Series data updated successfully"}
+        return {"status": "success", "message": "Series data updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

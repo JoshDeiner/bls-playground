@@ -22,8 +22,7 @@ def map_bls_data_with_ids(response):
     series_data_entries = []
     calculations_entries = []
 
-    for idx, data_point in enumerate(
-            response["data"]["Results"]["series"][0]["data"]):
+    for idx, data_point in enumerate(response["data"]["Results"]["series"][0]["data"]):
         # Create series_data entry
         series_data_entry = {
             "series_id": idx + 1,  # Assume sequential IDs starting from 1

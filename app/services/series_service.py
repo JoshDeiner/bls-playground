@@ -8,8 +8,7 @@ from app.schemas.series import (CalculationsCreate, SeriesDataCreate,
 # Function to insert or update series data
 def upsert_series(db: Session, series: SeriesRequest):
     # Check if series already exists
-    db_series = db.query(Series).filter(
-        Series.catalog_id == series.seriesID).first()
+    db_series = db.query(Series).filter(Series.catalog_id == series.seriesID).first()
 
     if not db_series:
         # Create a new series if it doesn't exist
