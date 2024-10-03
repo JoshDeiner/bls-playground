@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.series import Series, SeriesData, Calculations
 from app.schemas.series import SeriesRequest, SeriesDataCreate, CalculationsCreate
 
+
 # Function to insert or update series data
 def upsert_series(db: Session, series: SeriesRequest):
     # Check if series already exists
@@ -16,7 +17,7 @@ def upsert_series(db: Session, series: SeriesRequest):
             survey_name=series.catalog.survey_name,
             measure_data_type=series.catalog.measure_data_type,
             area=series.catalog.area,
-            item=series.catalog.item
+            item=series.catalog.item,
         )
         db.add(db_series)
         db.commit()
@@ -24,11 +25,15 @@ def upsert_series(db: Session, series: SeriesRequest):
 
     # Now insert or update the series data
     for data_point in series.data:
-        db_series_data = db.query(SeriesData).filter(
-            SeriesData.series_id == db_series.id,
-            SeriesData.year == data_point.year,
-            SeriesData.period == data_point.period
-        ).first()
+        db_series_data = (
+            db.query(SeriesData)
+            .filter(
+                SeriesData.series_id == db_series.id,
+                SeriesData.year == data_point.year,
+                SeriesData.period == data_point.period,
+            )
+            .first()
+        )
 
         if not db_series_data:
             # Create new series data entry
@@ -37,7 +42,7 @@ def upsert_series(db: Session, series: SeriesRequest):
                 year=data_point.year,
                 period=data_point.period,
                 period_name=data_point.period_name,
-                value=data_point.value
+                value=data_point.value,
             )
             db.add(db_series_data)
             db.commit()
@@ -46,16 +51,18 @@ def upsert_series(db: Session, series: SeriesRequest):
         # Insert or update calculations
         calculations = data_point.calculations
         if calculations:
-            db_calculations = db.query(Calculations).filter(
-                Calculations.series_data_id == db_series_data.id
-            ).first()
+            db_calculations = (
+                db.query(Calculations)
+                .filter(Calculations.series_data_id == db_series_data.id)
+                .first()
+            )
 
             if not db_calculations:
                 # Create new calculations entry
                 db_calculations = Calculations(
                     series_data_id=db_series_data.id,
                     pct_changes=calculations.pct_changes,
-                    net_changes=calculations.net_changes
+                    net_changes=calculations.net_changes,
                 )
                 db.add(db_calculations)
             else:

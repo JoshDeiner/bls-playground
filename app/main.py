@@ -32,6 +32,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def request_key_builder(
     func,
     namespace: str = "",
@@ -40,12 +41,14 @@ def request_key_builder(
     response: Response = None,
     **kwargs,
 ):
-    return ":".join([
-        namespace,
-        request.method.lower(),
-        request.url.path,
-        repr(sorted(request.query_params.items()))
-    ])
+    return ":".join(
+        [
+            namespace,
+            request.method.lower(),
+            request.url.path,
+            repr(sorted(request.query_params.items())),
+        ]
+    )
 
 
 async def get_bls_data(api_endpoint: str):
@@ -69,30 +72,30 @@ class ORJsonCoder(Coder):
         return orjson.loads(value)
 
 
-
-
-
 app = FastAPI()
 
 app.include_router(series_router)
 
 KEY = os.getenv("REG_KEY")
 
+
 @app.get("/")
-        return {"message": "Hello World"}
+def home():
+    return {"message": "Hello World"}
+
 
 @app.post("/inflation_all/")
 async def bls_response():
-    url = 'https://api.bls.gov/publicAPI/v2/timeseries/data/'
+    url = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
     payload = {
         #    inputs are start year, endyear
         # maybe you stream it
         "seriesid": ["SUUR0000SA0"],
         "startyear": "2018",
-        "endyear":"2022", 
+        "endyear": "2022",
         "catalog": True,
         "calculations": True,
-        "registrationkey": KEY
+        "registrationkey": KEY,
     }
 
     async with httpx.AsyncClient() as client:
@@ -100,7 +103,6 @@ async def bls_response():
 
     # Return the response from the third-party API or your own message
     return {"status": response.status_code, "data": response.json()}
-
 
 
 # this is okay and mildly interesting
@@ -114,7 +116,6 @@ async def bls_response():
 ######## !!!!!!! so now what i would like to see if maybe can you cache this data and create some kind of strategy !!!!! ###
 
 #### then present the API to be consumed by a llm model ####
-
 
 
 #### TODO NEXT ADD logging. Why?

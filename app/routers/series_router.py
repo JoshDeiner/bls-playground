@@ -5,6 +5,7 @@ from app.services.series_service import upsert_series
 from app.database import get_db
 
 from app.services.bls_service import fetch_bls_series_data
+
 router = APIRouter()
 
 # API to handle series data updates
@@ -21,7 +22,6 @@ def update_series(series_request: SeriesRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
 ### probably doesnt work above. need the request object somewhere. need to figure out.
 ### but overall probably done for now. map out what your plan for tomorrow is. and then end of the day maybe you can do
 ### 1 more hour okay
@@ -35,7 +35,7 @@ def update_series(series_request: SeriesRequest, db: Session = Depends(get_db)):
 #         # maybe you stream it
 #         "seriesid": ["SUUR0000SA0"],
 #         "startyear": "2018",
-#         "endyear":"2022", 
+#         "endyear":"2022",
 #         "catalog": True,
 #         "calculations": True,
 #         "registrationkey": KEY
