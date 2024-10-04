@@ -1,55 +1,48 @@
+# API to handle series data updates
+
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.schemas import SeriesRequest
-from app.models.series import Calculations, Series, SeriesData
+from app.models.series import Calculations
+from app.models.series import Series
+from app.models.series import SeriesData
+
 from app.services.bls_service import fetch_bls_series_data
 from app.services.processing import map_bls_data_with_ids
-from app.services.series_service import upsert_series
+
+from app.services.series_service import upsert_series_payload  # Import the function
 
 router = APIRouter()
 
-# API to handle series data updates
 
-
-# this is probably not right. on the post we hit the 3rd party
-# probably at least need to pass in an ID
-@router.post("/series")
-async def update_series(db: Session = Depends(get_db)):
+# catalog_id = 'SUUR0000SA0'
+@router.post("/series/{catalog_id}")
+async def update_series(catalog_id: str, db: Session = Depends(get_db)):
 
     try:
-        # ideal dode
-        # bls_data = await fetch_bls_series_data("SUUR0000SA0")
-        # You'd map the BLS data to your SeriesRequest Pydantic model here
-        # srequest = map_bls_data_with_ids(bls_data)
-        # print("series_request", srequest)
-
         # Fetch BLS data using the async function
-        logging.info("pre bls hit")
-        bls_data = await fetch_bls_series_data("SUUR0000SA0")
-        # logging.info(bls_data)
-
-        # logging.info(bls_data)
+        bls_data = await fetch_bls_series_data(catalog_id)
 
         # Map the BLS data to your SeriesRequest Pydantic model here
-        logging.info("request incoming")
+        logging.info("Request incoming")
         request = map_bls_data_with_ids(bls_data)
-        logging.info("post map bls data")
+        logging.info("Post map BLS data")
 
-        # Call the upsert function with the mapped data
-        upsert_series(request, db)
+        # Call the upsert_series_payload orchestrator function with the mapped data
+        upsert_series_payload(request, db, catalog_id)
 
-        logging.info(upsert_series)
+        logging.info("Successfully called upsert_series_payload")
 
-        # mock object
-        # request = map_bls_data_with_ids()
-        # series = request.get("series", 1)
-        # upsert_series(request, db)
-        return {"status": "success",
-                "message": "Series data updated successfully"}
+        return {
+            "status": "success",
+            "message": "Series data updated successfully"
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -113,3 +106,40 @@ def get_series(catalog_id: str, db: Session = Depends(get_db)):
         response["data"].append(series_data_response)
 
     return response
+
+
+
+
+# GET endpoint to retrieve series data based on series_id
+
+@router.get("/series_data/")
+def get_series_data(db: Session = Depends(get_db)):
+    try:
+        # Query to retrieve the series data for the provided series_id
+        series_data = db.query(SeriesData).all()
+
+        if not series_data:
+            raise HTTPException(status_code=404, detail="No data found for the given series ID")
+
+        return series_data
+
+    except Exception as e:
+        logging.error(f"Error retrieving series data: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+# GET endpoint to retrieve all calculations
+@router.get("/calculations")
+def get_all_calculations(db: Session = Depends(get_db)):
+    try:
+        # Query to retrieve all calculations
+        calculations = db.query(Calculations).all()
+
+        if not calculations:
+            raise HTTPException(status_code=404, detail="No calculations data found")
+
+        return calculations
+
+    except Exception as e:
+        logging.error(f"Error retrieving calculations data: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")

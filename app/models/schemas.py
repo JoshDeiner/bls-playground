@@ -38,7 +38,6 @@ class SeriesData(BaseModel):
 
 # Main series request model, includes catalog and data
 class SeriesRequest(BaseModel):
-    # catalog_id: int
     series: Series
     series_data: List[SeriesData]
     calculations: Calculations
