@@ -1,10 +1,7 @@
 import os
 
 import httpx
-from fastapi import HTTPException
-
-from fastapi import APIRouter
-
+from fastapi import APIRouter, HTTPException
 
 KEY = os.getenv("REG_KEY")
 
@@ -34,6 +31,3 @@ async def fetch_bls_series_data(series_id: str = "SUUR0000SA0"):
                 status_code=response.status_code,
                 detail="Error fetching data from BLS API",
             )
-
-
-            

@@ -1,15 +1,14 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.schemas import SeriesRequest
-from app.services.bls_service import fetch_bls_series_data
-from app.services.series_service import upsert_series
-from app.services.processing import map_bls_data_with_ids
 from app.models.series import Calculations, Series, SeriesData
-
+from app.services.bls_service import fetch_bls_series_data
+from app.services.processing import map_bls_data_with_ids
+from app.services.series_service import upsert_series
 
 router = APIRouter()
 
@@ -19,7 +18,7 @@ router = APIRouter()
 # this is probably not right. on the post we hit the 3rd party
 # probably at least need to pass in an ID
 @router.post("/series")
-def update_series(db: Session = Depends(get_db)):
+async def update_series(db: Session = Depends(get_db)):
 
     try:
         # ideal dode
@@ -28,14 +27,30 @@ def update_series(db: Session = Depends(get_db)):
         # srequest = map_bls_data_with_ids(bls_data)
         # print("series_request", srequest)
 
-        # mock object
-        request = map_bls_data_with_ids()
-        series = request.get("series", 1)
+        # Fetch BLS data using the async function
+        logging.info("pre bls hit")
+        bls_data = await fetch_bls_series_data("SUUR0000SA0")
+        # logging.info(bls_data)
+
+        # logging.info(bls_data)
+
+        # Map the BLS data to your SeriesRequest Pydantic model here
+        logging.info("request incoming")
+        request = map_bls_data_with_ids(bls_data)
+        logging.info("post map bls data")
+
+        # Call the upsert function with the mapped data
         upsert_series(request, db)
+
+        logging.info(upsert_series)
+
+        # mock object
+        # request = map_bls_data_with_ids()
+        # series = request.get("series", 1)
+        # upsert_series(request, db)
         return {"status": "success", "message": "Series data updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 # Define the GET endpoint for retrieving series data by catalog_id
@@ -51,8 +66,10 @@ def get_series(catalog_id: str, db: Session = Depends(get_db)):
 
     # Fetch all associated series data
     # compary series_data id against parent id
-    #ie series has a has many relationship with SeriesData
-    db_series_data = db.query(SeriesData).filter(SeriesData.series_id == db_series.id).all()
+    # ie series has a has many relationship with SeriesData
+    db_series_data = (
+        db.query(SeriesData).filter(SeriesData.series_id == db_series.id).all()
+    )
 
     if not db_series_data:
         raise HTTPException(status_code=404, detail="No series data found")
@@ -66,8 +83,8 @@ def get_series(catalog_id: str, db: Session = Depends(get_db)):
         "measure_data_type": db_series.measure_data_type,
         "area": db_series.area,
         "item": db_series.item,
-        # empty data list bc will fill later with series_data after making 
-        "data": []
+        # empty data list bc will fill later with series_data after making
+        "data": [],
     }
 
     # For each series data, fetch its associated calculations and append to the response
@@ -86,8 +103,8 @@ def get_series(catalog_id: str, db: Session = Depends(get_db)):
             "value": series_data.value,
             "calculations": {
                 "pct_changes": db_calculations.pct_changes if db_calculations else None,
-                "net_changes": db_calculations.net_changes if db_calculations else None
-            }
+                "net_changes": db_calculations.net_changes if db_calculations else None,
+            },
         }
         response["data"].append(series_data_response)
 

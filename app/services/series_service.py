@@ -1,23 +1,18 @@
 # service to insert or update series data
 
 
-from sqlalchemy.orm import Session
+import logging
 
+from sqlalchemy.orm import Session
 
 # change names
 from app.models.series import Calculations, Series, SeriesData
-
-import logging
-
-
-
-
-
 
 # make it work with data coming from the endpoint
 
 # Todo ! then modurlaize functions
 # make catalog_id dynamic
+
 
 def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
     logging.info("init upsert")
@@ -27,7 +22,7 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
 
         # Extract the series part of the payload (catalog-level data)
         series_payload = payload.get("series", {})
-        
+
         if not series_payload:
             logging.error("No series data found in the payload.")
             return
@@ -48,7 +43,7 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
 
             db_series = Series(
                 catalog_id=series_payload.get("catalog_id", 1),
-                catalog_title=series_payload.get('catalog_title', 1),
+                catalog_title=series_payload.get("catalog_title", 1),
                 seasonality=series_payload.get("seasonality", 1),
                 survey_name=series_payload.get("survey_name", 1),
                 measure_data_type=series_payload.get("measure_data_type", 1),
@@ -57,10 +52,9 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
             )
             db.add(db_series)
 
-
         else:
             logging.info(series_payload)
-            
+
             # If series exists, compare and update fields that are different
             logging.info(f"Found existing series with catalog_id: {catalog_id}")
             updated_fields = False
@@ -94,13 +88,11 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
                 db.commit()
                 db.refresh(db_series)
             # Create a new series if it doesn't exist
-            
+
         # Final save if series was newly created or updated
         db.commit()
         db.refresh(db_series)
         logging.info(f"Successfully inserted/updated series: {db_series.catalog_id}")
-
-        
 
         # insert series data to series_data table
 
@@ -119,7 +111,7 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
             )
 
             if not db_series_data:
-        #         # Create new series data entry
+                #         # Create new series data entry
                 db_series_data = SeriesData(
                     series_id=db_series.id,
                     year=data_point.get("year", 1),
@@ -130,7 +122,9 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
                 db.add(db_series_data)
                 db.commit()
                 db.refresh(db_series_data)
-                logging.info(f"Inserted new series data for year {data_point.get('year')} and period {data_point.get('period')}.")
+                logging.info(
+                    f"Inserted new series data for year {data_point.get('year')} and period {data_point.get('period')}."
+                )
             else:
                 # If the data exists, check if it has changed and update it if necessary
                 has_changes = False
@@ -150,25 +144,26 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
                     db_series_data.value = float(data_point.get("value", 1))
                     has_changes = True
 
-
             if has_changes:
                 db.commit()
                 db.refresh(db_series_data)
-                print(f"Updated series data for year {data_point.get('year')} and period {data_point.get('period')}.")
+                print(
+                    f"Updated series data for year {data_point.get('year')} and period {data_point.get('period')}."
+                )
             else:
-                print(f"No changes detected for year {data_point.get('year')} and period {data_point.get('period')}.")
+                print(
+                    f"No changes detected for year {data_point.get('year')} and period {data_point.get('period')}."
+                )
 
-
-
-# calculations insert
+        # calculations insert
         calc_payload = payload.get("calculations", [])
         print("calc", calc_payload)
 
         # Iterate over each calculation object in the list
         for calc_item in calc_payload:
-            series_data_id = calc_item.get('series_data_id')
-            pct_changes = calc_item.get('pct_changes', {})
-            net_changes = calc_item.get('net_changes', {})
+            series_data_id = calc_item.get("series_data_id")
+            pct_changes = calc_item.get("pct_changes", {})
+            net_changes = calc_item.get("net_changes", {})
 
             # Query for existing calculations with matching series_data_id
             db_calculations = (
@@ -179,7 +174,7 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
             print("db_calculations", db_calculations)
 
             if not db_calculations:
-            # Create new calculations entry
+                # Create new calculations entry
                 db_calculations = Calculations(
                     series_data_id=series_data_id,
                     pct_changes=pct_changes,
@@ -188,7 +183,9 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
                 db.add(db_calculations)
                 db.commit()
                 db.refresh(db_calculations)
-                logging.info(f"Inserted new calculations for series_data_id {series_data_id}.")
+                logging.info(
+                    f"Inserted new calculations for series_data_id {series_data_id}."
+                )
             else:
                 if db_calculations.pct_changes != pct_changes:
                     db_calculations.pct_changes = pct_changes
@@ -201,12 +198,15 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
                 if has_changes:
                     db.commit()
                     db.refresh(db_calculations)
-                    logging.info(f"Updated calculations for series_data_id {series_data_id}.")
+                    logging.info(
+                        f"Updated calculations for series_data_id {series_data_id}."
+                    )
                 else:
-                    logging.info(f"No changes detected for calculations for series_data_id {series_data_id}.")
+                    logging.info(
+                        f"No changes detected for calculations for series_data_id {series_data_id}."
+                    )
 
     except Exception as e:
         db.rollback()  # Rollback the session in case of errors
         print(f"Error inserting/updating series: {e}")
         raise e
-

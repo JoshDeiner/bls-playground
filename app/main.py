@@ -20,9 +20,9 @@ from redis.asyncio.connection import ConnectionPool
 from starlette.requests import Request
 from starlette.responses import Response
 
+from app.database import init_db
 # local imports
 from app.routers.series_router import router as series_router
-from app.database import init_db
 
 load_dotenv()
 
@@ -75,6 +75,7 @@ app = FastAPI()
 app.include_router(series_router)
 
 KEY = os.getenv("REG_KEY")
+
 
 @app.on_event("startup")
 def startup_event():
