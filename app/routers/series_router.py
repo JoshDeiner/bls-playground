@@ -30,7 +30,7 @@ def update_series(db: Session = Depends(get_db)):
         # mock object
         request = map_bls_data_with_ids()
         series = request.get("series", 1)
-        upsert_series(series, db)
+        upsert_series(request, db)
         return {"status": "success", "message": "Series data updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

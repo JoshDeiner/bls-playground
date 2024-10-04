@@ -58,3 +58,11 @@ class Calculations(Base):
 
     # Relationship back to SeriesData
     series_data = relationship("SeriesData", back_populates="calculations")
+
+    def __repr__(self):
+        return (
+            f"<Calculations(id={self.id}, "
+            f"series_data_id={self.series_data_id}, "
+            f"pct_changes={self.pct_changes}, "
+            f"net_changes={self.net_changes})>"
+        )
