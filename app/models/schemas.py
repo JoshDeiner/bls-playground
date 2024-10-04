@@ -35,9 +35,9 @@ class SeriesData(BaseModel):
 # essentially we just have a series object that access directly
 # how will this work with SeriesRequest. do you access SeriesRequest?
 
+
 # Main series request model, includes catalog and data
 class SeriesRequest(BaseModel):
-    # catalog_id: int
     series: Series
     series_data: List[SeriesData]
     calculations: Calculations

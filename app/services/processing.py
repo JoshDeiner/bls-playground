@@ -1,109 +1,60 @@
+import logging
+
+from fastapi import HTTPException
 
 
+def map_bls_data_with_ids(bls_response):
+    # Extract data from the BLS response (simulate API response if needed)
+    response = bls_response
 
-def map_bls_data_with_ids():
-    response = {
-    "status": 200,
-    "data": {
-        "status": "REQUEST_SUCCEEDED",
-        "responseTime": 153,
-        "message": [],
-        "Results": {
-            "series": [
-                {
-                    "seriesID": "SUUR0000SA0",
-                    "catalog": {
-                        "series_title": "All items in U.S. city average, all urban consumers, chained, not seasonally adjusted",
-                        "series_id": "SUUR0000SA0",
-                        "seasonality": "Not Seasonally Adjusted",
-                        "survey_name": "Chained Consumer Price Index for All Urban Consumers (C-CPI-U): U.S. city average",
-                        "survey_abbreviation": "SU",
-                        "measure_data_type": "All items",
-                        "area": "U.S. city average",
-                        "item": "All items",
-                    },
-                    "data": [
-                        {
-                            "year": "2022",
-                            "period": "M12",
-                            "periodName": "December",
-                            "value": "165.974",
-                            "footnotes": [{}],
-                            "calculations": {
-                                "net_changes": {},
-                                "pct_changes": {
-                                    "1": "-0.3",
-                                    "3": "0.1",
-                                    "6": "0.3",
-                                    "12": "6.4",
-                                },
-                            },
-                        },
-                        {
-                            "year": "2022",
-                            "period": "M11",
-                            "periodName": "November",
-                            "value": "166.498",
-                            "footnotes": [{}],
-                            "calculations": {
-                                "net_changes": {},
-                                "pct_changes": {
-                                    "1": "-0.1",
-                                    "3": "0.7",
-                                    "6": "1.8",
-                                    "12": "7.0",
-                                },
-                            },
-                        },
-                    ],
-                }
-            ]
-        },
-    },
-}
+    if not response:
+        raise HTTPException(status_code=404,
+                            detail="No response received from the API")
 
-    # 1. Extract series block
+    logging.info(f"Response received from API")
+
+    # Check if series and data exist
+    if not response.get("Results") or not response["Results"].get("series"):
+        raise HTTPException(
+            status_code=400, detail="No valid series data found in the API response"
+        )
+
+    # Extract the series information
+    series_data = response["Results"]["series"][0]
     series_entry = {
-        "catalog_id": response["data"]["Results"]["series"][0]["seriesID"],
-        "catalog_title": response["data"]["Results"]["series"][0]["catalog"][
-            "series_title"
-        ],
-        "seasonality": response["data"]["Results"]["series"][0]["catalog"][
-            "seasonality"
-        ],
-        "survey_name": response["data"]["Results"]["series"][0]["catalog"][
-            "survey_name"
-        ],
-        "measure_data_type": response["data"]["Results"]["series"][0]["catalog"][
-            "measure_data_type"
-        ],
-        "area": response["data"]["Results"]["series"][0]["catalog"]["area"],
-        "item": response["data"]["Results"]["series"][0]["catalog"]["item"],
+        "catalog_id": series_data.get("seriesID"),
+        "catalog_title": series_data.get("catalog", {}).get("series_title"),
+        "seasonality": series_data.get("catalog", {}).get("seasonality"),
+        "survey_name": series_data.get("catalog", {}).get("survey_name"),
+        "measure_data_type": series_data.get("catalog", {}).get("measure_data_type"),
+        "area": series_data.get("catalog", {}).get("area"),
+        "item": series_data.get("catalog", {}).get("item"),
     }
 
-    # 2. Extract series_data block
+    # Initialize lists for series data and calculations
     series_data_entries = []
     calculations_entries = []
 
-    for idx, data_point in enumerate(response["data"]["Results"]["series"][0]["data"]):
-        # Create series_data entry
+    # Extract the series data and calculations
+    for idx, data_point in enumerate(series_data.get("data", [])):
         series_data_entry = {
-            "series_id": idx + 1,  # Assume sequential IDs starting from 1
-            "year": data_point["year"],
-            "period": data_point["period"],
-            "period_name": data_point["periodName"],
-            "value": data_point["value"],
-            "footnotes": data_point.get(
-                "footnotes", [{}]
-            ),  # Defaults to empty if missing
+            # You can let the database handle the ID instead of using idx+1 if
+            # needed
+            "series_id": idx + 1,  # Can be replaced if auto-generated by the DB
+            "year": data_point.get("year"),
+            "period": data_point.get("period"),
+            "period_name": data_point.get("periodName"),
+            "value": data_point.get("value"),
+            "footnotes": data_point.get("footnotes", [{}]),
         }
         series_data_entries.append(series_data_entry)
 
-        # Create calculations entry
         calculations_entry = {
-            "series_data_id": idx + 1,  # Corresponds to series_data ID
-            "pct_changes": data_point["calculations"].get("pct_changes", {}),
-            "net_changes": data_point["calculations"].get("net_changes", {}),
+            "series_data_id": idx
+            + 1,
+            # Corresponds to series_data ID (or use actual DB-assigned ID)
+            "pct_changes": data_point.get("calculations", {}).get("pct_changes", {}),
+            "net_changes": data_point.get("calculations", {}).get("net_changes", {}),
         }
         calculations_entries.append(calculations_entry)
 
@@ -115,4 +66,3 @@ def map_bls_data_with_ids():
     }
 
     return result
-
