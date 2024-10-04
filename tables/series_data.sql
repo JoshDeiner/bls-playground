@@ -1,4 +1,4 @@
-CREATE TABLE series_data (
+CREATE TABLE IF NOT EXISTS series_data (
     id SERIAL PRIMARY KEY,
     series_id INT REFERENCES series(id),
     year VARCHAR(4),

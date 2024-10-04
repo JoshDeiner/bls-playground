@@ -1,48 +1,94 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from app.schemas.series import SeriesRequest
-from app.services.series_service import upsert_series
-from app.database import get_db
 
+from app.database import get_db
+from app.models.schemas import SeriesRequest
 from app.services.bls_service import fetch_bls_series_data
+from app.services.series_service import upsert_series
+from app.services.processing import map_bls_data_with_ids
+from app.models.series import Calculations, Series, SeriesData
+
+
 router = APIRouter()
 
 # API to handle series data updates
 
 
-### this is probably not right. on the post we hit the 3rd party
-### probably at least need to pass in an ID
+# this is probably not right. on the post we hit the 3rd party
+# probably at least need to pass in an ID
 @router.post("/series")
-def update_series(series_request: SeriesRequest, db: Session = Depends(get_db)):
+def update_series(db: Session = Depends(get_db)):
+
     try:
-        upsert_series(db, series_request)
+        # ideal dode
+        # bls_data = await fetch_bls_series_data("SUUR0000SA0")
+        # You'd map the BLS data to your SeriesRequest Pydantic model here
+        # srequest = map_bls_data_with_ids(bls_data)
+        # print("series_request", srequest)
+
+        # mock object
+        request = map_bls_data_with_ids()
+        series = request.get("series", 1)
+        upsert_series(request, db)
         return {"status": "success", "message": "Series data updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 
-### probably doesnt work above. need the request object somewhere. need to figure out.
-### but overall probably done for now. map out what your plan for tomorrow is. and then end of the day maybe you can do
-### 1 more hour okay
+# Define the GET endpoint for retrieving series data by catalog_id
+# SUUR0000SA0
+@router.get("/series/{catalog_id}")
+def get_series(catalog_id: str, db: Session = Depends(get_db)):
+    # Fetch the series by catalog_id
+    # is the first really necessary? catalog_id is supposed to be unique. so theoretically should only be one in the table
+    db_series = db.query(Series).filter(Series.catalog_id == catalog_id).one_or_none()
 
-### i think you're pretty close to getting the dummy data inserted which is great
+    if not db_series:
+        raise HTTPException(status_code=404, detail="Series not found")
 
-# async def bls_response():
-#     url = 'https://api.bls.gov/publicAPI/v2/timeseries/data/'
-#     payload = {
-#         #    inputs are start year, endyear
-#         # maybe you stream it
-#         "seriesid": ["SUUR0000SA0"],
-#         "startyear": "2018",
-#         "endyear":"2022", 
-#         "catalog": True,
-#         "calculations": True,
-#         "registrationkey": KEY
-#     }
+    # Fetch all associated series data
+    # compary series_data id against parent id
+    #ie series has a has many relationship with SeriesData
+    db_series_data = db.query(SeriesData).filter(SeriesData.series_id == db_series.id).all()
 
-#     async with httpx.AsyncClient() as client:
-#         response = await client.post(url, json=payload)
+    if not db_series_data:
+        raise HTTPException(status_code=404, detail="No series data found")
 
-#     # Return the response from the third-party API or your own message
-#     return {"status": response.status_code, "data": response.json()}
+    # Prepare the response object
+    response = {
+        "catalog_id": db_series.catalog_id,
+        "catalog_title": db_series.catalog_title,
+        "seasonality": db_series.seasonality,
+        "survey_name": db_series.survey_name,
+        "measure_data_type": db_series.measure_data_type,
+        "area": db_series.area,
+        "item": db_series.item,
+        # empty data list bc will fill later with series_data after making 
+        "data": []
+    }
+
+    # For each series data, fetch its associated calculations and append to the response
+    for series_data in db_series_data:
+        db_calculations = (
+            db.query(Calculations)
+            .filter(Calculations.series_data_id == series_data.id)
+            .first()
+        )
+
+        # Add data point and calculations to the response
+        series_data_response = {
+            "year": series_data.year,
+            "period": series_data.period,
+            "period_name": series_data.period_name,
+            "value": series_data.value,
+            "calculations": {
+                "pct_changes": db_calculations.pct_changes if db_calculations else None,
+                "net_changes": db_calculations.net_changes if db_calculations else None
+            }
+        }
+        response["data"].append(series_data_response)
+
+    return response

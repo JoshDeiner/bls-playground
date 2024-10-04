@@ -1,61 +1,8 @@
-def map_bls_data_with_ids(response):
-    # 1. Extract series block
-    series_entry = {
-        "catalog_id": response["data"]["Results"]["series"][0]["seriesID"],
-        "catalog_title": response["data"]["Results"]["series"][0]["catalog"][
-            "series_title"
-        ],
-        "seasonality": response["data"]["Results"]["series"][0]["catalog"][
-            "seasonality"
-        ],
-        "survey_name": response["data"]["Results"]["series"][0]["catalog"][
-            "survey_name"
-        ],
-        "measure_data_type": response["data"]["Results"]["series"][0]["catalog"][
-            "measure_data_type"
-        ],
-        "area": response["data"]["Results"]["series"][0]["catalog"]["area"],
-        "item": response["data"]["Results"]["series"][0]["catalog"]["item"],
-    }
-
-    # 2. Extract series_data block
-    series_data_entries = []
-    calculations_entries = []
-
-    for idx, data_point in enumerate(response["data"]["Results"]["series"][0]["data"]):
-        # Create series_data entry
-        series_data_entry = {
-            "series_id": idx + 1,  # Assume sequential IDs starting from 1
-            "year": data_point["year"],
-            "period": data_point["period"],
-            "period_name": data_point["periodName"],
-            "value": data_point["value"],
-            "footnotes": data_point.get(
-                "footnotes", [{}]
-            ),  # Defaults to empty if missing
-        }
-        series_data_entries.append(series_data_entry)
-
-        # Create calculations entry
-        calculations_entry = {
-            "series_data_id": idx + 1,  # Corresponds to series_data ID
-            "pct_changes": data_point["calculations"].get("pct_changes", {}),
-            "net_changes": data_point["calculations"].get("net_changes", {}),
-        }
-        calculations_entries.append(calculations_entry)
-
-    # Final result: mapping into key-value pairs
-    result = {
-        "series": series_entry,
-        "series_data": series_data_entries,
-        "calculations": calculations_entries,
-    }
-
-    return result
 
 
-# Example usage:
-response_object = {
+
+def map_bls_data_with_ids():
+    response = {
     "status": 200,
     "data": {
         "status": "REQUEST_SUCCEEDED",
@@ -115,6 +62,57 @@ response_object = {
     },
 }
 
-# Call the function and print the result
-mapped_data = map_bls_data_with_ids(response_object)
-print(mapped_data.get("calculations", 1))
+    # 1. Extract series block
+    series_entry = {
+        "catalog_id": response["data"]["Results"]["series"][0]["seriesID"],
+        "catalog_title": response["data"]["Results"]["series"][0]["catalog"][
+            "series_title"
+        ],
+        "seasonality": response["data"]["Results"]["series"][0]["catalog"][
+            "seasonality"
+        ],
+        "survey_name": response["data"]["Results"]["series"][0]["catalog"][
+            "survey_name"
+        ],
+        "measure_data_type": response["data"]["Results"]["series"][0]["catalog"][
+            "measure_data_type"
+        ],
+        "area": response["data"]["Results"]["series"][0]["catalog"]["area"],
+        "item": response["data"]["Results"]["series"][0]["catalog"]["item"],
+    }
+
+    # 2. Extract series_data block
+    series_data_entries = []
+    calculations_entries = []
+
+    for idx, data_point in enumerate(response["data"]["Results"]["series"][0]["data"]):
+        # Create series_data entry
+        series_data_entry = {
+            "series_id": idx + 1,  # Assume sequential IDs starting from 1
+            "year": data_point["year"],
+            "period": data_point["period"],
+            "period_name": data_point["periodName"],
+            "value": data_point["value"],
+            "footnotes": data_point.get(
+                "footnotes", [{}]
+            ),  # Defaults to empty if missing
+        }
+        series_data_entries.append(series_data_entry)
+
+        # Create calculations entry
+        calculations_entry = {
+            "series_data_id": idx + 1,  # Corresponds to series_data ID
+            "pct_changes": data_point["calculations"].get("pct_changes", {}),
+            "net_changes": data_point["calculations"].get("net_changes", {}),
+        }
+        calculations_entries.append(calculations_entry)
+
+    # Final result: mapping into key-value pairs
+    result = {
+        "series": series_entry,
+        "series_data": series_data_entries,
+        "calculations": calculations_entries,
+    }
+
+    return result
+
