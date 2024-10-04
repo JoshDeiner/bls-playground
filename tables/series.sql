@@ -1,3 +1,5 @@
+
+# change seriesID to catalogID
 CREATE TABLE IF NOT EXISTS series (
     id SERIAL PRIMARY KEY,
     series_id VARCHAR(50) UNIQUE,
