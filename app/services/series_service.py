@@ -28,12 +28,14 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
             return
 
         # Check if series already exists based on catalog_id
-        db_series = db.query(Series).filter(Series.catalog_id == catalog_id).first()
+        db_series = db.query(Series).filter(
+            Series.catalog_id == catalog_id).first()
         logging.info("db query")
 
         # logging.info(f"series:{sesries}")
         # Check if series already exists
-        db_series = db.query(Series).filter(catalog_id == Series.catalog_id).first()
+        db_series = db.query(Series).filter(
+            catalog_id == Series.catalog_id).first()
 
         logging.info("db query")
 
@@ -56,11 +58,13 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
             logging.info(series_payload)
 
             # If series exists, compare and update fields that are different
-            logging.info(f"Found existing series with catalog_id: {catalog_id}")
+            logging.info(
+                f"Found existing series with catalog_id: {catalog_id}")
             updated_fields = False
 
             if db_series.catalog_title != series_payload.get("catalog_title"):
-                db_series.catalog_title = series_payload.get("catalog_title", 1)
+                db_series.catalog_title = series_payload.get(
+                    "catalog_title", 1)
                 updated_fields = True
 
             if db_series.seasonality != series_payload.get("seasonality"):
@@ -71,8 +75,10 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
                 db_series.survey_name = series_payload.get("survey_name", 1)
                 updated_fields = True
 
-            if db_series.measure_data_type != series_payload.get("measure_data_type"):
-                db_series.measure_data_type = series_payload.get("measure_data_type", 1)
+            if db_series.measure_data_type != series_payload.get(
+                    "measure_data_type"):
+                db_series.measure_data_type = series_payload.get(
+                    "measure_data_type", 1)
                 updated_fields = True
 
             if db_series.area != series_payload.get("area"):
@@ -92,7 +98,8 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
         # Final save if series was newly created or updated
         db.commit()
         db.refresh(db_series)
-        logging.info(f"Successfully inserted/updated series: {db_series.catalog_id}")
+        logging.info(
+            f"Successfully inserted/updated series: {db_series.catalog_id}")
 
         # insert series data to series_data table
 
@@ -126,7 +133,8 @@ def upsert_series(payload, db: Session, catalog_id="SUUR0000SA0"):
                     f"Inserted new series data for year {data_point.get('year')} and period {data_point.get('period')}."
                 )
             else:
-                # If the data exists, check if it has changed and update it if necessary
+                # If the data exists, check if it has changed and update it if
+                # necessary
                 has_changes = False
                 if db_series_data.period_name != data_point.get("period_name"):
                     db_series_data.period_name = data_point.get("period_name")

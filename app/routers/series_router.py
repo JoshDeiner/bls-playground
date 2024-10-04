@@ -48,7 +48,8 @@ async def update_series(db: Session = Depends(get_db)):
         # request = map_bls_data_with_ids()
         # series = request.get("series", 1)
         # upsert_series(request, db)
-        return {"status": "success", "message": "Series data updated successfully"}
+        return {"status": "success",
+                "message": "Series data updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -58,8 +59,10 @@ async def update_series(db: Session = Depends(get_db)):
 @router.get("/series/{catalog_id}")
 def get_series(catalog_id: str, db: Session = Depends(get_db)):
     # Fetch the series by catalog_id
-    # is the first really necessary? catalog_id is supposed to be unique. so theoretically should only be one in the table
-    db_series = db.query(Series).filter(Series.catalog_id == catalog_id).one_or_none()
+    # is the first really necessary? catalog_id is supposed to be unique. so
+    # theoretically should only be one in the table
+    db_series = db.query(Series).filter(
+        Series.catalog_id == catalog_id).one_or_none()
 
     if not db_series:
         raise HTTPException(status_code=404, detail="Series not found")
@@ -87,7 +90,8 @@ def get_series(catalog_id: str, db: Session = Depends(get_db)):
         "data": [],
     }
 
-    # For each series data, fetch its associated calculations and append to the response
+    # For each series data, fetch its associated calculations and append to
+    # the response
     for series_data in db_series_data:
         db_calculations = (
             db.query(Calculations)
