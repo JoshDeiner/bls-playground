@@ -1,11 +1,11 @@
 todo
 
 
+finish series feature component
+organize services
 
-decide on architecture pattern. #2
-  -> should you change naming conventions
+should you group together series stuff under bls flag?
 
- what to do with models.schemas
 
 
 
@@ -14,3 +14,6 @@ add logging #4
 
 add testing #5
 	-> some standard to know when things break
+
+can delete models.schemas
+

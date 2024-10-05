@@ -9,9 +9,10 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.series import Calculations
 from app.models.series import Series
 from app.models.series import SeriesData
+from app.models.series import Calculations
+
 
 from app.services.bls_service import fetch_bls_series_data
 from app.services.processing import map_bls_data_with_ids
@@ -106,40 +107,3 @@ def get_series(catalog_id: str, db: Session = Depends(get_db)):
         response["data"].append(series_data_response)
 
     return response
-
-
-
-
-# GET endpoint to retrieve series data based on series_id
-
-@router.get("/series_data/")
-def get_series_data(db: Session = Depends(get_db)):
-    try:
-        # Query to retrieve the series data for the provided series_id
-        series_data = db.query(SeriesData).all()
-
-        if not series_data:
-            raise HTTPException(status_code=404, detail="No data found for the given series ID")
-
-        return series_data
-
-    except Exception as e:
-        logging.error(f"Error retrieving series data: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-
-# GET endpoint to retrieve all calculations
-@router.get("/calculations")
-def get_all_calculations(db: Session = Depends(get_db)):
-    try:
-        # Query to retrieve all calculations
-        calculations = db.query(Calculations).all()
-
-        if not calculations:
-            raise HTTPException(status_code=404, detail="No calculations data found")
-
-        return calculations
-
-    except Exception as e:
-        logging.error(f"Error retrieving calculations data: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
