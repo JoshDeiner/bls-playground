@@ -4,9 +4,11 @@ todo
 
 
 
-should you group together series stuff under bls flag?
+migrate to using bls_survey
 
+change models/series.py -> models/bls_series.py
 
+write some documentation on your approach through the ai
 
 
 add logging #4
