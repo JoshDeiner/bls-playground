@@ -21,4 +21,3 @@ class SeriesRepository:
     # Method to fetch calculations for a specific series data
     def get_calculations_by_series_data_id(self, series_data_id: int):
         return self.db.query(Calculations).filter(Calculations.series_data_id == series_data_id).first()
-

@@ -12,16 +12,16 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.database import get_db
-from app.calculations.repository import CalculationsRepository
-from app.calculations.dto import Calculation as CalculationSchema  # Import the Pydantic schema
+from app.bls_survey.calculations.calculations_repository import CalculationsRepository
+from app.bls_survey.calculations.calculation_dto import CalculationDTO
 
 
-router = APIRouter()
+calculations_router = APIRouter()
 
 
 
 # GET endpoint to retrieve all calculations
-@router.get("/calculations", response_model=List[CalculationSchema])
+@calculations_router.get("/calculations", response_model=List[CalculationDTO])
 def get_all_calculations(db: Session = Depends(get_db)):
     try:
         # Use the repository to get the data

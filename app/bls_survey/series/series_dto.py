@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List
-from app.calculations.dto import Calculation as CalculationDTO
+from app.bls_survey.calculations.calculation_dto import CalculationDTO
 
 # DTO for the series data with calculations
 class SeriesDataDTOFull(BaseModel):
@@ -15,7 +15,7 @@ class SeriesDataDTOFull(BaseModel):
 
 
 # DTO for the series object
-class Series(BaseModel):
+class SeriesDTO(BaseModel):
     catalog_id: str
     catalog_title: str
     seasonality: str

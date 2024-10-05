@@ -9,17 +9,17 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 
-from app.series.repository import SeriesRepository
-from app.series.dto import Series as SeriesDTO
+from app.bls_survey.series.series_repository import SeriesRepository
+from app.bls_survey.series.series_dto import SeriesDTO
 
-from app.series.services.bls_service import fetch_bls_series_data
-from app.series.services.processing import map_bls_data_with_ids
-from app.series.services.series_service import upsert_series_payload
+from app.bls_survey.series.services.bls_service import fetch_bls_series_data
+from app.bls_survey.series.services.processing import map_bls_data_with_ids
+from app.bls_survey.series.services.series_service import upsert_series_payload
 
-router = APIRouter()
+series_router = APIRouter()
 
 # POST endpoint to update series data
-@router.post("/series/{catalog_id}")
+@series_router.post("/series/{catalog_id}")
 async def update_series(catalog_id: str, db: Session = Depends(get_db)):
     try:
         # Fetch BLS data using the async function
@@ -42,7 +42,7 @@ async def update_series(catalog_id: str, db: Session = Depends(get_db)):
 
 
 # GET endpoint to retrieve series data by catalog_id
-@router.get("/series/{catalog_id}", response_model=SeriesDTO)
+@series_router.get("/series/{catalog_id}", response_model=SeriesDTO)
 def get_series(catalog_id: str, db: Session = Depends(get_db)):
     try:
         # Initialize repository

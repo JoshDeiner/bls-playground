@@ -1,9 +1,9 @@
 # app/routes.py
 
 from fastapi import APIRouter
-from app.series.router import router as series_router
-from app.calculations.router import router as calculations_router
-from app.series_data.router import router as series_data_router
+from app.bls_survey.series.series_router import series_router
+from app.bls_survey.calculations.calculations_router import calculations_router
+from app.bls_survey.series_data.series_data_router import series_data_router
 
 # Create a main router to include all feature routers
 router = APIRouter()

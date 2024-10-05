@@ -8,14 +8,16 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.database import get_db
-from app.series_data.repository import SeriesDataRepository
-from app.series_data.dto import SeriesDataDTOPartial
 
-router = APIRouter()
+
+from app.database import get_db
+from app.bls_survey.series_data.series_data_repository import SeriesDataRepository
+from app.bls_survey.series_data.series_data_dto import SeriesDataDTOPartial
+
+series_data_router = APIRouter()
 
 # GET endpoint to retrieve all series data
-@router.get("/series_data", response_model=List[SeriesDataDTOPartial])
+@series_data_router.get("/series_data", response_model=List[SeriesDataDTOPartial])
 def get_all_series_data(db: Session = Depends(get_db)):
     try:
         repository = SeriesDataRepository(db)
