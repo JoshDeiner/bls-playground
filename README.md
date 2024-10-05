@@ -2,11 +2,13 @@ todo
 
 
 
-decide on architecture pattern. #2
-  -> should you change naming conventions
 
- what to do with models.schemas
 
+
+
+
+
+write some documentation on your approach through the ai
 
 
 add logging #4
@@ -14,3 +16,5 @@ add logging #4
 
 add testing #5
 	-> some standard to know when things break
+
+

@@ -6,7 +6,9 @@ from fastapi import FastAPI
 
 # local imports
 from app.database import init_db
-from app.routers.series_router import router as series_router
+
+# Import from routes
+from app.routes import router as app_router  
 
 load_dotenv()
 
@@ -15,7 +17,9 @@ logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
-app.include_router(series_router)
+# Include the combined router from app.routes
+app.include_router(app_router)
+
 
 KEY = os.getenv("REG_KEY")
 

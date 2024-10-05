@@ -3,7 +3,10 @@
 
 from sqlalchemy.orm import Session
 
-from app.models.series import Calculations, Series, SeriesData
+from app.bls_survey.models.series import Series
+from app.bls_survey.models.series import SeriesData
+from app.bls_survey.models.series import Calculations
+
 
 import logging
 
