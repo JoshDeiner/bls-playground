@@ -2,18 +2,20 @@
 
 
 import logging
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.database import get_db
 from app.series_data.repository import SeriesDataRepository
-from app.series_data.dto import SeriesData as SeriesDataDTO
+from app.series_data.dto import SeriesDataDTOPartial
 
 router = APIRouter()
 
 # GET endpoint to retrieve all series data
-@router.get("/series_data", response_model=List[SeriesDataDTO])
+@router.get("/series_data", response_model=List[SeriesDataDTOPartial])
 def get_all_series_data(db: Session = Depends(get_db)):
     try:
         repository = SeriesDataRepository(db)

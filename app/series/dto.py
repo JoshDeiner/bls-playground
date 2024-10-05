@@ -1,9 +1,20 @@
 from pydantic import BaseModel
-from typing import Dict, Optional
+from typing import List
+from app.calculations.dto import Calculation as CalculationDTO
 
-from app.series_data.dto import SeriesData as SeriesDataDTO
+# DTO for the series data with calculations
+class SeriesDataDTOFull(BaseModel):
+    year: str
+    period: str
+    period_name: str
+    value: float
+    calculations: CalculationDTO
+
+    class Config:
+        orm_mode = True
 
 
+# DTO for the series object
 class Series(BaseModel):
     catalog_id: str
     catalog_title: str
@@ -12,7 +23,7 @@ class Series(BaseModel):
     measure_data_type: str
     area: str
     item: str
-    data: SeriesDataDTO
+    data: List[SeriesDataDTOFull]  # Update to a list
 
     class Config:
         orm_mode = True

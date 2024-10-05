@@ -1,7 +1,7 @@
 todo
 
 
-finish series feature component
+
 organize services
 
 should you group together series stuff under bls flag?
