@@ -12,9 +12,9 @@ from app.database import get_db
 from app.series.repository import SeriesRepository
 from app.series.dto import Series as SeriesDTO
 
-from app.services.bls_service import fetch_bls_series_data
-from app.services.processing import map_bls_data_with_ids
-from app.services.series_service import upsert_series_payload
+from app.series.services.bls_service import fetch_bls_series_data
+from app.series.services.processing import map_bls_data_with_ids
+from app.series.services.series_service import upsert_series_payload
 
 router = APIRouter()
 

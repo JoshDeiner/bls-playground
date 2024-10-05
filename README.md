@@ -2,7 +2,7 @@ todo
 
 
 
-organize services
+
 
 should you group together series stuff under bls flag?
 
@@ -15,5 +15,4 @@ add logging #4
 add testing #5
 	-> some standard to know when things break
 
-can delete models.schemas
 
