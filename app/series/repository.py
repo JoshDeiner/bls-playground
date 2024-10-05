@@ -1,9 +1,9 @@
 # app/series_data/repository.py
 
 from sqlalchemy.orm import Session
-from app.models.series import Series
-from app.models.series import SeriesData
-from app.models.series import Calculations
+from app.bls_survey.models.series import Series
+from app.bls_survey.models.series import SeriesData
+from app.bls_survey.models.series import Calculations
 
 
 class SeriesRepository:

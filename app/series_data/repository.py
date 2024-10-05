@@ -1,7 +1,7 @@
 # app/series_data/repository.py
 
 from sqlalchemy.orm import Session
-from app.models.series import SeriesData
+from app.bls_survey.models.series import SeriesData
 
 class SeriesDataRepository:
     def __init__(self, db: Session):

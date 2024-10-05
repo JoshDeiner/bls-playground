@@ -29,7 +29,7 @@ Base = declarative_base()
 
 # Function to initialize the database tables
 def init_db():
-    import app.models.series  # Import your models here
+    import app.bls_survey.models.series  # Import your models here
 
     Base.metadata.create_all(bind=engine)
 
