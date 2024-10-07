@@ -6,4 +6,4 @@ class CalculationDTO(BaseModel):
     net_changes: Optional[Dict[str, str]]
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -11,7 +11,7 @@ class SeriesDataDTOFull(BaseModel):
     calculations: CalculationDTO
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # DTO for the series object
@@ -26,4 +26,4 @@ class SeriesDTO(BaseModel):
     data: List[SeriesDataDTOFull]  # Update to a list
 
     class Config:
-        orm_mode = True
+        from_attributes = True

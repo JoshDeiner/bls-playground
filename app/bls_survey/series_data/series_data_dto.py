@@ -9,4 +9,4 @@ class SeriesDataDTOPartial(BaseModel):
     value: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
