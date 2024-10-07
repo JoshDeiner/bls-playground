@@ -10,7 +10,7 @@ class SeriesDataDTOFull(BaseModel):
     value: float
     calculations: CalculationDTO
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
@@ -25,5 +25,5 @@ class SeriesDTO(BaseModel):
     item: str
     data: List[SeriesDataDTOFull]  # Update to a list
 
-    class Config:
+    class ConfigDict:
         from_attributes = True

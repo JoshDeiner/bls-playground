@@ -33,7 +33,12 @@ def get_all_calculations(db: Session = Depends(get_db)):
 
         return calculations
 
+    except HTTPException as http_error:
+        raise http_error
+
     except Exception as e:
         logging.error(f"Error retrieving calculations data: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
 

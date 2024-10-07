@@ -8,5 +8,5 @@ class SeriesDataDTOPartial(BaseModel):
     period_name: str
     value: float
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
