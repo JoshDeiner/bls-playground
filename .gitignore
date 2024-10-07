@@ -3,4 +3,4 @@ __pycache__*
 .env*
 test.db
 run.sh
-app.log
+*.log

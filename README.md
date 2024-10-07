@@ -2,8 +2,7 @@ todo
 
 
 
-logging:
-	-> setup basic logging with logging lib and file, config_file
+uvicorn app.main:app --reload 
 
 
 add testing #5
